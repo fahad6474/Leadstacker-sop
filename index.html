@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadStacker Bot Operations SOP</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --black: #0A0A0A;
+            --pink: #FF1B8D;
+            --yellow: #FFD700;
+            --light-gray: #F5F5F5;
+            --dark-gray: #1A1A1A;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6; color: var(--black); background: white; overflow-x: hidden; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: 260px; height: 100vh;
+            background: var(--black); padding: 0; overflow-y: auto; z-index: 1000;
+            display: flex; flex-direction: column;
+        }
+        .sidebar-header { padding: 1.5rem 1.5rem 1.2rem; border-bottom: 2px solid var(--pink); }
+        .logo { font-size: 1.6rem; font-weight: 900; color: white; margin-bottom: 0.3rem; }
+        .logo-accent { color: var(--pink); }
+        .tagline { font-size: 0.7rem; color: var(--yellow); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .nav-link {
+            display: block; padding: 0.6rem 1.5rem; color: rgba(255,255,255,0.65);
+            text-decoration: none; font-weight: 500; font-size: 0.85rem;
+            transition: all 0.2s; border-left: 3px solid transparent;
+        }
+        .nav-link:hover { color: white; background: rgba(255,27,141,0.12); border-left-color: var(--pink); }
+        .nav-link.active { color: var(--yellow); background: rgba(255,215,0,0.08); border-left-color: var(--yellow); }
+
+        .menu-toggle {
+            display: none; position: fixed; top: 1rem; left: 1rem; z-index: 1100;
+            background: var(--pink); color: white; border: none; padding: 0.65rem 0.85rem;
+            border-radius: 8px; cursor: pointer; font-size: 1.2rem;
+        }
+
+        /* Main */
+        .main-content { margin-left: 260px; min-height: 100vh; }
+        .header {
+            background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+            color: white; padding: 3rem 3rem 2.5rem; border-bottom: 4px solid var(--pink);
+        }
+        .header-title { font-size: 2.6rem; font-weight: 900; margin-bottom: 0.4rem; }
+        .header-subtitle { font-size: 1rem; color: var(--yellow); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        .metadata { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.75rem; }
+        .meta-item { background: rgba(255,255,255,0.08); padding: 0.85rem 1rem; border-radius: 8px; border-left: 3px solid var(--yellow); }
+        .meta-label { font-size: 0.65rem; text-transform: uppercase; color: var(--yellow); font-weight: 700; letter-spacing: 1px; margin-bottom: 0.2rem; }
+        .meta-value { font-size: 0.95rem; font-weight: 600; color: white; }
+
+        .content { padding: 2.5rem 3rem; max-width: 1100px; }
+        .section { margin-bottom: 3.5rem; padding-top: 1.5rem; }
+
+        h1 { font-size: 2rem; font-weight: 900; color: var(--black); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 4px solid var(--pink); }
+        h2 { font-size: 1.4rem; font-weight: 800; color: var(--black); margin-top: 1.75rem; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.6rem; }
+        h2::before { content: ""; display: inline-block; width: 4px; height: 1.2rem; background: var(--pink); border-radius: 2px; flex-shrink: 0; }
+        h3 { font-size: 1.15rem; font-weight: 700; color: var(--black); margin-top: 1.25rem; margin-bottom: 0.7rem; }
+        p { margin-bottom: 0.85rem; color: #333; line-height: 1.7; }
+
+        table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden; }
+        th { background: var(--black); color: var(--yellow); padding: 0.85rem 1rem; text-align: left; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 0.85rem 1rem; border-bottom: 1px solid #e5e5e5; vertical-align: top; font-size: 0.9rem; }
+        tr:nth-child(even) { background: var(--light-gray); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255,27,141,0.04); }
+
+        .alert { padding: 1rem 1.25rem; border-radius: 8px; margin: 1.25rem 0; border-left: 4px solid; }
+        .alert-danger { background: #FFF0F5; border-color: var(--pink); color: #880033; }
+        .alert-warning { background: #FFFEF0; border-color: var(--yellow); color: #775500; }
+        .alert-info { background: #F0F0FF; border-color: #6366F1; color: #4338CA; }
+        .alert-success { background: #F0FDF4; border-color: #10B981; color: #065F46; }
+        .alert strong { display: block; font-weight: 700; margin-bottom: 0.4rem; font-size: 1rem; }
+
+        ul, ol { margin: 0.85rem 0 0.85rem 1.75rem; }
+        li { margin-bottom: 0.4rem; line-height: 1.6; font-size: 0.92rem; }
+
+        .checklist { list-style: none; margin-left: 0; }
+        .checklist li { padding: 0.65rem 0.75rem 0.65rem 2.75rem; position: relative; background: var(--light-gray); margin-bottom: 0.4rem; border-radius: 6px; }
+        .checklist li::before { content: "☐"; position: absolute; left: 0.85rem; font-size: 1.1rem; color: var(--pink); font-weight: 700; }
+
+        code { background: var(--light-gray); padding: 0.15rem 0.45rem; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.88em; color: var(--pink); font-weight: 600; }
+        pre { background: var(--black); color: var(--yellow); padding: 1.25rem; border-radius: 8px; overflow-x: auto; margin: 1.25rem 0; border-left: 4px solid var(--pink); font-size: 0.85rem; line-height: 1.6; }
+        pre code { background: none; color: var(--yellow); padding: 0; }
+
+        .badge { display: inline-block; padding: 0.28rem 0.65rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-right: 0.4rem; margin-bottom: 0.4rem; }
+        .badge-primary { background: var(--pink); color: white; }
+        .badge-secondary { background: var(--yellow); color: var(--black); }
+        .badge-dark { background: var(--black); color: var(--yellow); }
+
+        .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin: 1.5rem 0; }
+        .platform-card { background: white; border: 2px solid var(--light-gray); border-radius: 10px; padding: 1.5rem; transition: all 0.3s; position: relative; overflow: hidden; }
+        .platform-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--pink) 0%, var(--yellow) 100%); }
+        .platform-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255,27,141,0.18); border-color: var(--pink); }
+        .platform-name { font-size: 1.25rem; font-weight: 800; color: var(--black); margin-bottom: 0.5rem; }
+        .platform-desc { color: #666; font-size: 0.88rem; line-height: 1.5; }
+
+        /* Footer */
+        footer {
+            background: var(--black); color: white; padding: 2.5rem 3rem;
+            text-align: center;
+        }
+        .footer-logo { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.75rem; }
+        footer p { color: rgba(255,255,255,0.6); margin: 0.4rem 0; font-size: 0.9rem; }
+        .confidential { display: inline-block; background: var(--pink); color: white; padding: 0.6rem 1.25rem; border-radius: 25px; font-weight: 700; margin-top: 1.25rem; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; }
+
+        /* Back to top */
+        .back-to-top { position: fixed; bottom: 2rem; right: 2rem; background: var(--pink); color: white; width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(255,27,141,0.35); transition: all 0.3s; opacity: 0; pointer-events: none; border: none; font-size: 1.3rem; }
+        .back-to-top.visible { opacity: 1; pointer-events: all; }
+        .back-to-top:hover { background: var(--yellow); color: var(--black); transform: translateY(-3px); }
+
+        .print-btn { position: fixed; bottom: 2rem; right: 5.5rem; background: var(--yellow); color: var(--black); padding: 0.65rem 1.25rem; border-radius: 25px; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(255,215,0,0.35); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; }
+        .print-btn:hover { background: var(--pink); color: white; transform: translateY(-3px); }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .menu-toggle { display: block; }
+            .main-content { margin-left: 0; }
+            .content { padding: 1.5rem; }
+            .header { padding: 2rem 1.5rem; }
+            h1 { font-size: 1.6rem; }
+            .print-btn { display: none; }
+            .back-to-top { bottom: 1rem; right: 1rem; }
+        }
+        @media print {
+            .sidebar, .back-to-top, .print-btn, .menu-toggle { display: none !important; }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo"><img src="https://leadstacker.com/wp-content/uploads/2025/04/LeadStacker-1.png" width="200"></div>
+        <div class="tagline">Bot Operations SOP</div>
+    </div>
+    <ul class="nav-menu">
+        <li><a href="#section-1" class="nav-link">1. About This SOP</a></li>
+        <li><a href="#section-2" class="nav-link">2. Universal Standards</a></li>
+        <li><a href="#section-3" class="nav-link">3. Closebot</a></li>
+        <li><a href="#section-4" class="nav-link">4. CommentGuard</a></li>
+        <li><a href="#section-5" class="nav-link">5. Synth</a></li>
+        <li><a href="#section-6" class="nav-link">6. GHL Integration</a></li>
+        <li><a href="#section-7" class="nav-link">7. Client Onboarding</a></li>
+        <li><a href="#section-8" class="nav-link">8. Maintenance</a></li>
+        <li><a href="#section-9" class="nav-link">9. Appendices</a></li>
+    </ul>
+</nav>
+
+<div class="main-content">
+    <header class="header">
+        <div class="header-title">AI BOT OPERATIONS</div>
+        <div class="header-subtitle">Standard Operating Procedure</div>
+        <div class="metadata">
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v2.0</div></div>
+            <div class="meta-item"><div class="meta-label">Effective Date</div><div class="meta-value">March 30, 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Platforms</div><div class="meta-value"><span class="badge badge-primary">Closebot</span><span class="badge badge-primary">CommentGuard</span><span class="badge badge-primary">Synth</span></div></div>
+            <div class="meta-item"><div class="meta-label">Review Cycle</div><div class="meta-value">Quarterly</div></div>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- SECTION 1 -->
+        <section class="section" id="section-1">
+            <h1>1. About This SOP</h1>
+            <p>Internal standards for building, configuring, auditing, and maintaining AI-powered bots across all LeadStacker clients.</p>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-name">Closebot</div>
+                    <div class="platform-desc">Conversational AI for Facebook Messenger, SMS, and Email</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-name">CommentGuard</div>
+                    <div class="platform-desc">AI-powered Facebook comment management and engagement</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-name">Synth</div>
+                    <div class="platform-desc">Proprietary AI SMS chatbot (n8n + Claude API + GHL)</div>
+                </div>
+            </div>
+
+            <h2>1.1 Roles & Responsibilities</h2>
+            <table>
+                <thead><tr><th>Role</th><th>Responsibility</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Bot Builder</strong></td><td>Follow all setup steps and QA checklists</td></tr>
+                    <tr><td><strong>Account Manager</strong></td><td>Ensure monthly audits and documentation</td></tr>
+                    <tr><td><strong>Operations Lead</strong></td><td>Own the SOP — review quarterly, update as needed</td></tr>
+                    <tr><td><strong>Developer</strong></td><td>Implement integrations, workflows, API connections</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section class="section" id="section-2">
+            <h1>2. Universal Standards</h1>
+            <div class="alert alert-danger">
+                <strong>⚠️ NON-NEGOTIABLE RULES</strong>
+                These apply to every bot we build and must be verified at every QA review.
+            </div>
+
+            <h2>2.1 The 10 Bot Rules</h2>
+            <table>
+                <thead><tr><th>#</th><th>Rule</th><th>Why It Matters</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>1</strong></td><td>Business hours must reflect actual availability</td><td>Incorrect hours cause missed leads</td></tr>
+                    <tr><td><strong>2</strong></td><td>Never collect payment info, SSNs, or credentials</td><td>Legal/compliance risk</td></tr>
+                    <tr><td><strong>3</strong></td><td>Route complaints to support, not lead bots</td><td>Destroys lead experience</td></tr>
+                    <tr><td><strong>4</strong></td><td>Honor opt-outs immediately and permanently</td><td>TCPA/CAN-SPAM requirement</td></tr>
+                    <tr><td><strong>5</strong></td><td>All bots must have abuse detection active</td><td>Prevents fake leads</td></tr>
+                    <tr><td><strong>6</strong></td><td>Save AND publish — drafts are not live</td><td>Common support issue</td></tr>
+                    <tr><td><strong>7</strong></td><td>Re-open Settings after publish to verify</td><td>Platforms can revert changes</td></tr>
+                    <tr><td><strong>8</strong></td><td>Follow client's AI identity preference</td><td>Some require disclosure</td></tr>
+                    <tr><td><strong>9</strong></td><td>Verify all offer details with client first</td><td>Prevents chargebacks</td></tr>
+                    <tr><td><strong>10</strong></td><td>Max 3 follow-ups per lead across all channels</td><td>Deliverability protection</td></tr>
+                </tbody>
+            </table>
+
+            <h2>2.2 Naming Convention</h2>
+            <div class="alert alert-info">
+                <strong>Format:</strong> <code>[Client Name] Bot ([Channel]) [Variant]</code><br><br>
+                <strong>Examples:</strong> Collins Mobile Bot (FB) &nbsp;|&nbsp; Invention Connect - Synth SMS &nbsp;|&nbsp; Collins Mobile - Sales Rep (On-Hour)
+            </div>
+        </section>
+
+        <!-- SECTION 3 -->
+        <section class="section" id="section-3">
+            <h1>3. Closebot</h1>
+            <p>Closebot handles conversational AI across Facebook Messenger, SMS, and Email channels. It is the primary lead engagement bot for most LeadStacker clients.</p>
+
+            <h2>3.1 Core Setup Steps</h2>
+            <ol>
+                <li>Connect the client's Facebook Page or GHL sub-account</li>
+                <li>Configure the bot persona (name, tone, AI identity disclosure)</li>
+                <li>Set accurate business hours matching client availability</li>
+                <li>Define the offer details — verify with client before programming</li>
+                <li>Set up abuse detection and opt-out triggers</li>
+                <li>Save AND publish — confirm live status after publish</li>
+            </ol>
+
+            <h2>3.2 Closebot QA Checklist</h2>
+            <ul class="checklist">
+                <li>Bot persona and name configured per client brief</li>
+                <li>Business hours set correctly (Monday through Sunday format)</li>
+                <li>Opt-out / STOP trigger confirmed working</li>
+                <li>Abuse detection enabled</li>
+                <li>Offer details verified with client</li>
+                <li>Bot saved and published (not draft)</li>
+                <li>Settings re-opened post-publish to confirm no revert</li>
+                <li>Test conversation completed end-to-end</li>
+            </ul>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Common Issue</strong>
+                Many support tickets come from bots left in draft. Always confirm "Published" status after saving.
+            </div>
+        </section>
+
+        <!-- SECTION 4 -->
+        <section class="section" id="section-4">
+            <h1>4. CommentGuard</h1>
+            <p>CommentGuard manages and engages with Facebook ad comments using AI, protecting brand reputation and driving leads from comment threads.</p>
+
+            <h2>4.1 What It Does</h2>
+            <ul>
+                <li>Auto-responds to comments on Facebook ads and posts</li>
+                <li>Hides or flags spam and negative comments for review</li>
+                <li>DMs engaged commenters to continue the conversation</li>
+                <li>Captures leads from organic comment activity</li>
+            </ul>
+
+            <h2>4.2 Setup Checklist</h2>
+            <ul class="checklist">
+                <li>Facebook Page connected with correct permissions</li>
+                <li>Ad account linked and ad sets selected</li>
+                <li>Comment reply tone and persona configured</li>
+                <li>Spam/negative sentiment filters active</li>
+                <li>DM follow-up sequence configured</li>
+                <li>Test comment posted and response verified</li>
+                <li>Client notified of what gets auto-hidden vs. flagged</li>
+            </ul>
+
+            <h2>4.3 Escalation Rules</h2>
+            <table>
+                <thead><tr><th>Trigger</th><th>Action</th></tr></thead>
+                <tbody>
+                    <tr><td>Negative sentiment detected</td><td>Flag for human review, do not auto-reply</td></tr>
+                    <tr><td>Complaint or refund request</td><td>Hide comment, alert account manager</td></tr>
+                    <tr><td>Competitor mention</td><td>Flag only — no automated response</td></tr>
+                    <tr><td>Spam / bot comment</td><td>Auto-hide immediately</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SECTION 5 -->
+        <section class="section" id="section-5">
+            <h1>5. Synth — AI SMS Chatbot</h1>
+            <div class="alert alert-success">
+                <strong>🚀 LeadStacker Proprietary Technology</strong>
+                Custom-built AI SMS system combining n8n automation, Claude AI, and GoHighLevel.
+            </div>
+
+            <h2>5.1 What Synth Does</h2>
+            <ul>
+                <li>Texts new leads immediately from ads or forms</li>
+                <li>Real conversations — handles objections, remembers context</li>
+                <li>Drives leads toward conversion (forms, bookings, calls)</li>
+                <li>Auto-tags and tracks everything in GHL</li>
+                <li>Multi-tenant — one system serves all clients</li>
+            </ul>
+
+            <h2>5.2 Architecture</h2>
+            <pre><code>Facebook Ad / Website Form
+    ↓
+GHL Sub-Account (client's account)
+    ↓  webhook fires, includes locationId
+n8n — master workflow pair
+    ↓  looks up client config by locationId
+Claude API — Jamie persona, built dynamically
+    ↓  returns: SMS reply + JSON actions
+n8n executes actions (tags, pipeline updates)
+    ↓
+GHL sends SMS back to lead
+    ↓
+Lead replies → loops back through chain</code></pre>
+
+            <h2>5.3 Lead Scoring & Sentiment</h2>
+            <table>
+                <thead><tr><th>Score / Signal</th><th>Tag Applied</th><th>Action</th></tr></thead>
+                <tbody>
+                    <tr><td>Score ≥ 8</td><td><span class="badge badge-primary">synth_high_intent</span></td><td>Prioritize for human follow-up</td></tr>
+                    <tr><td>Score 4–7</td><td><span class="badge badge-secondary">synth_medium_intent</span></td><td>Continue nurture sequence</td></tr>
+                    <tr><td>Score 1–3</td><td><span class="badge badge-dark">synth_low_intent</span></td><td>Deprioritize, minimal follow-up</td></tr>
+                    <tr><td>Negative sentiment</td><td><span class="badge badge-primary">synth_escalate</span></td><td>Alert human team immediately</td></tr>
+                </tbody>
+            </table>
+
+            <h2>5.4 Booking Confirmation Loop</h2>
+            <ul>
+                <li>Wait 3 hours after booking link is sent</li>
+                <li>Auto-check if booking was completed in GHL</li>
+                <li>Send one friendly follow-up if not completed</li>
+                <li>Tag accordingly and stop automated outreach</li>
+            </ul>
+
+            <h2>5.5 Synth QA Checklist</h2>
+            <ul class="checklist">
+                <li>Config added to BOTH n8n workflows</li>
+                <li>locationId correct (exact match from GHL)</li>
+                <li>Business hours match client availability</li>
+                <li>Conversion link tested and working</li>
+                <li>GHL Automation published</li>
+                <li>GHL Webhook configured correctly</li>
+                <li>Test SMS received within 2 minutes</li>
+                <li>Tags applied correctly in GHL</li>
+                <li>STOP keyword triggers opt-out</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 6 -->
+        <section class="section" id="section-6">
+            <h1>6. GHL Integration</h1>
+            <p>All bots connect into GoHighLevel as the central CRM. Correct GHL setup is required before any bot goes live.</p>
+
+            <h2>6.1 Required GHL Setup</h2>
+            <table>
+                <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+                <tbody>
+                    <tr><td>Sub-account created</td><td>One per client — never share sub-accounts</td></tr>
+                    <tr><td>Webhook URL</td><td>Configured in GHL triggers for inbound leads</td></tr>
+                    <tr><td>Pipeline stages</td><td>Match client's sales process before bot goes live</td></tr>
+                    <tr><td>Custom fields</td><td>Map bot data fields to GHL contact fields</td></tr>
+                    <tr><td>Tags</td><td>Synth tags pre-created: high/medium/low intent, escalate</td></tr>
+                    <tr><td>Automation</td><td>Published — not draft</td></tr>
+                </tbody>
+            </table>
+
+            <h2>6.2 Webhook Test</h2>
+            <ol>
+                <li>Submit a test lead through the client's form or ad</li>
+                <li>Confirm webhook fires in n8n execution log</li>
+                <li>Confirm contact created in GHL within 60 seconds</li>
+                <li>Confirm bot response sent (SMS/Messenger)</li>
+                <li>Confirm correct tags applied to GHL contact</li>
+            </ol>
+        </section>
+
+        <!-- SECTION 7 -->
+        <section class="section" id="section-7">
+            <h1>7. Client Onboarding</h1>
+            <p>Follow this checklist for every new client before any bot is activated.</p>
+
+            <h2>7.1 Pre-Build Requirements</h2>
+            <ul class="checklist">
+                <li>Client brief received and reviewed</li>
+                <li>Offer details confirmed in writing with client</li>
+                <li>Facebook Page access granted (if applicable)</li>
+                <li>GHL sub-account created and configured</li>
+                <li>Business hours confirmed in writing</li>
+                <li>AI identity preference confirmed (disclose vs. not)</li>
+                <li>Opt-out language approved by client</li>
+            </ul>
+
+            <h2>7.2 Go-Live Checklist</h2>
+            <ul class="checklist">
+                <li>All QA checklists completed for active bots</li>
+                <li>End-to-end test conversation passed</li>
+                <li>Client walkthrough completed</li>
+                <li>Client signed off on bot behavior</li>
+                <li>Change log entry created</li>
+                <li>Account manager assigned and briefed</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 8 -->
+        <section class="section" id="section-8">
+            <h1>8. Maintenance & Audits</h1>
+
+            <h2>8.1 Maintenance Schedule</h2>
+            <table>
+                <thead><tr><th>Frequency</th><th>Task</th><th>Owner</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Weekly</strong></td><td>Review conversation logs for errors or off-script responses</td><td>Account Manager</td></tr>
+                    <tr><td><strong>Weekly</strong></td><td>Check n8n Execution log for failures</td><td>Developer</td></tr>
+                    <tr><td><strong>Monthly</strong></td><td>Availability language audit (see prohibited phrases)</td><td>Bot Builder</td></tr>
+                    <tr><td><strong>Monthly</strong></td><td>Verify all URLs, links, and offers are current</td><td>Account Manager</td></tr>
+                    <tr><td><strong>Quarterly</strong></td><td>Full performance review with client</td><td>Operations Lead</td></tr>
+                    <tr><td><strong>Quarterly</strong></td><td>Update this SOP</td><td>Operations Lead</td></tr>
+                </tbody>
+            </table>
+
+            <h2>8.2 Monthly Availability Audit</h2>
+            <div class="alert alert-danger">
+                <strong>🔍 Search All Bot Configs for These Prohibited Phrases:</strong>
+                ❌ "Sunday: Closed" &nbsp;|&nbsp; ❌ "Closed on Sunday" &nbsp;|&nbsp; ❌ "Monday to Saturday" &nbsp;|&nbsp; ❌ "Mon-Sat"<br><br>
+                <strong>Action:</strong> Correct immediately → re-publish → document in change log.
+            </div>
+
+            <h2>8.3 Incident Response</h2>
+            <table>
+                <thead><tr><th>Issue</th><th>Immediate Action</th><th>Owner</th></tr></thead>
+                <tbody>
+                    <tr><td>Bot sending wrong offers</td><td>Pause bot → correct config → re-test → republish</td><td>Bot Builder</td></tr>
+                    <tr><td>n8n webhook failure</td><td>Check execution logs → fix workflow → retest</td><td>Developer</td></tr>
+                    <tr><td>Opt-out not honoring</td><td>Pause all outreach → fix immediately → audit all contacts</td><td>Operations Lead</td></tr>
+                    <tr><td>Lead data not syncing to GHL</td><td>Check webhook config → resubmit test lead → verify</td><td>Developer</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SECTION 9 -->
+        <section class="section" id="section-9">
+            <h1>9. Appendices</h1>
+
+            <h2>9.1 Quick Reference</h2>
+            <table>
+                <thead><tr><th>Standard</th><th>Rule</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Hours format</strong></td><td><code>Business Hours: [Days]: [Time] [TZ]</code></td></tr>
+                    <tr><td><strong>Correct days wording</strong></td><td>"Monday through Sunday" — NEVER "Mon–Sat"</td></tr>
+                    <tr><td><strong>Max follow-ups</strong></td><td>3 total across all channels</td></tr>
+                    <tr><td><strong>Opt-out</strong></td><td>Immediate and permanent on STOP</td></tr>
+                    <tr><td><strong>Change log</strong></td><td>Required for every configuration change</td></tr>
+                    <tr><td><strong>Bot naming</strong></td><td><code>[Client] Bot ([Channel]) [Variant]</code></td></tr>
+                    <tr><td><strong>Publish confirmation</strong></td><td>Always re-open Settings post-publish to verify</td></tr>
+                </tbody>
+            </table>
+
+            <h2>9.2 Synth Tag Glossary</h2>
+            <table>
+                <thead><tr><th>Tag</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="badge badge-primary">synth_high_intent</span></td><td>Lead score ≥ 8 — ready for human follow-up</td></tr>
+                    <tr><td><span class="badge badge-secondary">synth_medium_intent</span></td><td>Score 4–7 — continue nurture</td></tr>
+                    <tr><td><span class="badge badge-dark">synth_low_intent</span></td><td>Score 1–3 — deprioritize</td></tr>
+                    <tr><td><span class="badge badge-primary">synth_escalate</span></td><td>Negative sentiment — alert human team</td></tr>
+                    <tr><td><span class="badge badge-primary">synth_negative_sentiment</span></td><td>Flagged negative tone in conversation</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+    </div><!-- /content -->
+
+    <footer>
+        <div class="footer-logo"><img src="https://leadstacker.com/wp-content/uploads/2025/04/LeadStacker-1.png" width="200"></div>
+       
+        <p style="margin-top:0.5rem;">AI Bot Operations SOP &nbsp;·&nbsp; March 2026</p>
+        <div class="confidential">🔒 Internal Use Only</div>
+        <p style="margin-top:1.5rem;opacity:0.4;font-size:0.8rem;">© 2026 LeadStacker. All Rights Reserved.</p>
+    </footer>
+</div>
+
+<button class="back-to-top" id="btt">↑</button>
+<button class="print-btn" onclick="window.print()">📄 Print / PDF</button>
+
+<script>
+    // Active nav link on scroll
+    const sections = document.querySelectorAll('.section');
+    const links = document.querySelectorAll('.nav-link');
+    function updateActive() {
+        let idx = 0;
+        sections.forEach((s, i) => { if (window.scrollY + 150 >= s.offsetTop) idx = i; });
+        links.forEach(l => l.classList.remove('active'));
+        if (links[idx]) links[idx].classList.add('active');
+    }
+    window.addEventListener('scroll', updateActive);
+    updateActive();
+
+    // Smooth scroll nav
+    links.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+        });
+    });
+
+    // Back to top
+    const btt = document.getElementById('btt');
+    window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 300));
+    btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
