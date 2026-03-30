@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadStacker Bot Operations SOP v2.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --ls-primary: #FF6B35;
+            --ls-dark: #1A1A2E;
+            --ls-accent: #0F3460;
+            --ls-light: #F8F9FA;
+            --ls-gray: #6C757D;
+            --ls-border: #E9ECEF;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--ls-dark);
+            background: var(--ls-light);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--ls-dark) 0%, var(--ls-accent) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 4px solid var(--ls-primary);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-accent {
+            color: var(--ls-primary);
+        }
+        
+        .tagline {
+            font-size: 1rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .doc-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .doc-subtitle {
+            font-size: 1.1rem;
+            font-weight: 400;
+            opacity: 0.85;
+        }
+        
+        .metadata {
+            background: white;
+            max-width: 1200px;
+            margin: -2rem auto 2rem;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--ls-gray);
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .meta-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ls-dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .toc {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            margin-bottom: 3rem;
+            border-left: 4px solid var(--ls-primary);
+        }
+        
+        .toc h2 {
+            color: var(--ls-dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .toc-list {
+            list-style: none;
+        }
+        
+        .toc-list > li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .toc-list a {
+            color: var(--ls-accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .toc-list a:hover {
+            color: var(--ls-primary);
+        }
+        
+        .section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            color: var(--ls-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--ls-primary);
+        }
+        
+        h2 {
+            color: var(--ls-accent);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h3 {
+            color: var(--ls-dark);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h4 {
+            color: var(--ls-accent);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: var(--ls-dark);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+        }
+        
+        th {
+            background: var(--ls-accent);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--ls-border);
+            vertical-align: top;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+        
+        .alert-danger {
+            background: #fff5f5;
+            border-color: #e74c3c;
+            color: #c0392b;
+        }
+        
+        .alert-warning {
+            background: #fffbeb;
+            border-color: #f39c12;
+            color: #d68910;
+        }
+        
+        .alert-info {
+            background: #eff8ff;
+            border-color: var(--ls-accent);
+            color: var(--ls-accent);
+        }
+        
+        .alert-success {
+            background: #f0fdf4;
+            border-color: #10b981;
+            color: #059669;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .checklist li {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--ls-light);
+            border-radius: 6px;
+            position: relative;
+            padding-left: 2.5rem;
+        }
+        
+        .checklist li:before {
+            content: "□";
+            position: absolute;
+            left: 1rem;
+            font-size: 1.2rem;
+            color: var(--ls-primary);
+            font-weight: 700;
+        }
+        
+        code {
+            background: var(--ls-light);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--ls-accent);
+        }
+        
+        pre {
+            background: var(--ls-dark);
+            color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--ls-primary);
+        }
+        
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge-primary {
+            background: var(--ls-primary);
+            color: white;
+        }
+        
+        .badge-secondary {
+            background: var(--ls-accent);
+            color: white;
+        }
+        
+        .badge-light {
+            background: var(--ls-light);
+            color: var(--ls-dark);
+            border: 1px solid var(--ls-border);
+        }
+        
+        .platform-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid var(--ls-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: all 0.3s;
+        }
+        
+        .platform-card:hover {
+            border-color: var(--ls-primary);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.1);
+        }
+        
+        .platform-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--ls-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer {
+            background: var(--ls-dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .footer p {
+            color: rgba(255,255,255,0.7);
+            margin: 0.5rem 0;
+        }
+        
+        .confidential {
+            background: var(--ls-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        @media print {
+            .header, .footer {
+                break-inside: avoid;
+            }
+            .section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            Lead<span class="logo-accent">Stacker</span>
+        </div>
+        <div class="tagline">Automation & AI Solutions</div>
+        <div class="doc-title">AI BOT OPERATIONS</div>
+        <div class="doc-subtitle">Standard Operating Procedure</div>
+    </div>
+    
+    <div class="metadata">
+        <div class="meta-item">
+            <div class="meta-label">Document Version</div>
+            <div class="meta-value">v2.0</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Effective Date</div>
+            <div class="meta-value">March 30, 2026</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Owner</div>
+            <div class="meta-value">LeadStacker Operations Team</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Platforms Covered</div>
+            <div class="meta-value">
+                <span class="badge badge-primary">Closebot</span>
+                <span class="badge badge-primary">CommentGuard</span>
+                <span class="badge badge-primary">Synth</span>
+            </div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Applies To</div>
+            <div class="meta-value">All LeadStacker team members</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Review Cycle</div>
+            <div class="meta-value">Quarterly</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="toc section">
+            <h2>📋 Table of Contents</h2>
+            <ol class="toc-list">
+                <li><a href="#section-1">1. About This SOP</a></li>
+                <li><a href="#section-2">2. Universal Standards (All Platforms, All Clients)</a></li>
+                <li><a href="#section-3">3. Closebot — Build & Management SOP</a></li>
+                <li><a href="#section-4">4. CommentGuard — Build & Management SOP</a></li>
+                <li><a href="#section-5">5. Synth — AI SMS Chatbot System</a></li>
+                <li><a href="#section-6">6. GoHighLevel (GHL) Integration Standards</a></li>
+                <li><a href="#section-7">7. Client Onboarding — Bot Setup Workflow</a></li>
+                <li><a href="#section-8">8. Ongoing Maintenance & Audit Protocol</a></li>
+                <li><a href="#section-9">9. Appendices</a></li>
+            </ol>
+        </div>
+
+        <div class="section" id="section-1">
+            <h1>1. About This SOP</h1>
+            
+            <p>This document defines LeadStacker's internal standards for building, configuring, auditing, and maintaining AI-powered bots for our clients. It covers all three bot platforms currently in our stack:</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                <div class="platform-card">
+                    <div class="platform-name">Closebot</div>
+                    <p>Conversational AI bots for Facebook Messenger, SMS, and Email</p>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-name">CommentGuard</div>
+                    <p>AI-powered Facebook comment management and engagement</p>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-name">Synth</div>
+                    <p>Proprietary AI SMS chatbot system (n8n + Claude API + GHL)</p>
+                </div>
+            </div>
+
+            <h2>1.1 Who This Covers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Responsibility Under This SOP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Bot Builder / Onboarding Specialist</strong></td>
+                        <td>Follow all setup steps and QA checklists when creating new bots</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Account Manager</strong></td>
+                        <td>Ensure client bots are audited monthly and changes are documented</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operations Lead</strong></td>
+                        <td>Own the SOP itself — review quarterly, update when platforms change</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Developer</strong></td>
+                        <td>Implement technical integrations, n8n workflows, and API connections</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Client (Read-Only)</strong></td>
+                        <td>May view bot settings but should not edit without coordinating with LeadStacker</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="section-2">
+            <h1>2. Universal Standards (All Platforms, All Clients)</h1>
+            
+            <div class="alert alert-danger">
+                <strong>⚠️ NON-NEGOTIABLE RULES</strong><br>
+                The following rules apply to every bot we build, regardless of client, platform, or campaign type. These must be verified during every QA review.
+            </div>
+
+            <h2>2.1 The LeadStacker Bot Rules</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">#</th>
+                        <th>Rule</th>
+                        <th>Why It Matters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td>Business hours must always reflect actual availability — never say a day is closed if the team is available</td>
+                        <td>Incorrect hours cause missed leads and damage trust</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td>Bots must never collect payment information, SSNs, or sensitive credentials</td>
+                        <td>Legal/compliance risk and platform ToS violation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td>Existing customer complaints must always be routed to official support — never handled by lead bots</td>
+                        <td>Confusing support with sales destroys the lead experience</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td>Opt-out requests (STOP, UNSUBSCRIBE, NO THANKS, etc.) must be honored immediately and permanently</td>
+                        <td>Legal requirement under TCPA/CAN-SPAM</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td>All bots must have proper abuse detection active</td>
+                        <td>Prevents abuse and fake leads from wasting budget</td>
+                    </tr>
+                    <tr>
+                        <td><strong>6</strong></td>
+                        <td>Every bot edit must be saved AND published — a draft is not live</td>
+                        <td>Common cause of "why isn't the bot working" tickets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>7</strong></td>
+                        <td>Re-open Settings after every publish to verify changes saved correctly</td>
+                        <td>Platforms can silently revert changes on crash</td>
+                    </tr>
+                    <tr>
+                        <td><strong>8</strong></td>
+                        <td>Bot identity (AI vs. human) must follow client's explicit preference</td>
+                        <td>Some clients require AI disclosure; others prefer human persona</td>
+                    </tr>
+                    <tr>
+                        <td><strong>9</strong></td>
+                        <td>All offer details must be verified with client before going into any bot</td>
+                        <td>Incorrect offers create chargebacks and complaints</td>
+                    </tr>
+                    <tr>
+                        <td><strong>10</strong></td>
+                        <td>Maximum 3 follow-up attempts per lead across all channels combined</td>
+                        <td>More than 3 hurts deliverability and annoys leads</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>2.2 Naming Convention</h2>
+            <p>Consistent naming makes it easy to identify bots at a glance. Follow this format:</p>
+            
+            <div class="alert alert-info">
+                <strong>Format:</strong> <code>[Client Name] Bot ([Channel]) [Variant]</code>
+                <br><br>
+                <strong>Examples:</strong><br>
+                • Collins Mobile Bot (FB)<br>
+                • Collins Mobile Bot (SMS/Email)<br>
+                • Collins Mobile - Sales Rep (On-Hour)<br>
+                • Invention Connect - Synth SMS
+            </div>
+
+            <h2>2.3 Persona Standards</h2>
+            <p>Every bot needs a named persona that defines tone, voice, and identity:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setting</th>
+                        <th>Standard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td>Common first name (Jamie, Sam, Alex) — agreed with client</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Role Description</strong></td>
+                        <td>Clear and specific: "[Client] Sales Rep" — not generic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tone</strong></td>
+                        <td>Always: Friendly + Concise. Add Sincere/Realistic for sales.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>First Person</strong></td>
+                        <td>Always use "we"/"our" — never "they"/"their"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reply Length</strong></td>
+                        <td>Default: 2–3 lines per message. Keep conversational.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI Disclosure</strong></td>
+                        <td>Follow client preference. Document in config.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="section-5">
+            <h1>5. Synth — AI SMS Chatbot System</h1>
+            
+            <div class="alert alert-success">
+                <strong>🚀 LeadStacker Proprietary Technology</strong><br>
+                Synth is our custom-built AI SMS chatbot system combining n8n automation, Claude AI, and GoHighLevel for intelligent lead conversations.
+            </div>
+
+            <h2>5.1 What Synth Does</h2>
+            <p>Synth enables real-time, contextual SMS conversations with leads:</p>
+            <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+                <li>Texts new leads immediately when they come in from ads or forms</li>
+                <li>Has real conversations — handles objections, answers questions, remembers context</li>
+                <li>Drives leads toward conversion (forms, bookings, calls)</li>
+                <li>Tags and tracks everything automatically in GHL</li>
+                <li>Multi-tenant — one system serves all LeadStacker clients</li>
+            </ul>
+
+            <div class="alert alert-warning">
+                <strong>Important:</strong> This is NOT a simple autoresponder. Synth reads full conversation history and generates contextual responses via Claude API.
+            </div>
+
+            <h2>5.2 Synth Architecture Overview</h2>
+            <pre><code>Facebook Ad / Website Form
+    ↓
+GHL Sub-Account (client's account)
+    ↓ (webhook fires, includes locationId)
+n8n — ONE pair of master workflows
+    ↓ (looks up client config by locationId)
+Claude API — Jamie persona, built dynamically
+    ↓ (returns: SMS reply + JSON actions)
+n8n executes actions (tags, updates)
+    ↓
+GHL sends SMS back to lead
+    ↓
+Lead replies → loops back through chain</code></pre>
+
+            <h2>5.3 Tech Stack Components</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Tool</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CRM + SMS</strong></td>
+                        <td>GoHighLevel (GHL)</td>
+                        <td>All client data, conversations, pipelines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Automation</strong></td>
+                        <td>n8n</td>
+                        <td>Orchestrates everything — runs on LeadStacker VPS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI</strong></td>
+                        <td>Claude API</td>
+                        <td>Haiku for volume, Sonnet for high-value leads</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lead Source</strong></td>
+                        <td>Meta Lead Ads + Landing Pages</td>
+                        <td>Triggers GHL contact creation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>5.4 Key Features in Synth v2</h2>
+            
+            <h3>1. Lead Scoring (1–10 Intent)</h3>
+            <p>Claude scores each lead 1–10 on intent level every turn:</p>
+            <ul style="margin-left: 2rem;">
+                <li>Score ≥ 8 → <span class="badge badge-primary">synth_high_intent</span> tag + GHL alert</li>
+                <li>Score 4–7 → <span class="badge badge-secondary">synth_medium_intent</span> tag</li>
+                <li>Score 1–3 → <span class="badge badge-light">synth_low_intent</span> tag</li>
+            </ul>
+
+            <h3>2. Sentiment Detection → Auto-Escalation</h3>
+            <p>Claude returns sentiment field (positive/neutral/negative). If negative sentiment detected:</p>
+            <ul style="margin-left: 2rem;">
+                <li>Auto-adds <span class="badge badge-primary">synth_escalate</span> tag</li>
+                <li>Auto-adds <span class="badge badge-primary">synth_negative_sentiment</span> tag</li>
+                <li>Human team gets notification for follow-up</li>
+            </ul>
+
+            <h3>3. Booking Confirmation Loop</h3>
+            <p>When Jamie sends conversion link:</p>
+            <ul style="margin-left: 2rem;">
+                <li>Workflow starts 3-hour wait timer</li>
+                <li>After 3 hours, rechecks contact tags in GHL</li>
+                <li>If not completed → sends one friendly follow-up nudge</li>
+                <li>Nudge sent ONCE only</li>
+            </ul>
+
+            <h3>4. First-Reply Speed Tracking</h3>
+            <p>Timestamp of first SMS logged as GHL contact note showing "Speed to contact: Instant (automated)" — visible to sales team.</p>
+
+            <h2>5.5 Synth Tag Structure</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Meaning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>synth_active</code></td>
+                        <td>Synth is managing this lead</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_intro_sent</code></td>
+                        <td>First message sent</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_engaged</code></td>
+                        <td>Lead replied and is in conversation</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_interested</code></td>
+                        <td>Lead expressed genuine interest</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_isa_sent</code></td>
+                        <td>Conversion link sent to lead</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_isa_complete</code></td>
+                        <td>Lead confirmed completion</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_high_intent</code></td>
+                        <td>Lead score 8+ — flag for human outreach</td>
+                    </tr>
+                    <tr>
+                        <td><code>synth_escalate</code></td>
+                        <td>Needs human follow-up</td>
+                    </tr>
+                    <tr>
+                        <td><code>do_not_contact</code></td>
+                        <td>STOP received — never contact again</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>5.6 Setting Up Synth for a New Client</h2>
+            
+            <div class="alert alert-info">
+                <strong>Prerequisites:</strong><br>
+                • Client has active GHL sub-account<br>
+                • GHL Agency Token configured in n8n<br>
+                • Claude API key configured in n8n<br>
+                • Base prompt loaded in n8n Variables
+            </div>
+
+            <h3>Step-by-Step Setup</h3>
+            <ol style="margin-left: 2rem; line-height: 2;">
+                <li><strong>Get Client Information:</strong> GHL Location ID, offer details, business hours, conversion link</li>
+                <li><strong>Create Client Config:</strong> Fill in all required fields in config template</li>
+                <li><strong>Add Config to n8n:</strong> Paste into BOTH workflow Code nodes (New Lead + Inbound Reply)</li>
+                <li><strong>Set Up GHL Automation:</strong> Create "Synth — New Lead Trigger" workflow in client's GHL</li>
+                <li><strong>Set Up GHL Webhook:</strong> Add InboundMessage webhook pointing to n8n</li>
+                <li><strong>Test End-to-End:</strong> Create test contact, verify SMS flow</li>
+                <li><strong>Document:</strong> Add to client inventory and change log</li>
+            </ol>
+
+            <h2>5.7 Synth QA Checklist</h2>
+            <ul class="checklist">
+                <li>Client config added to BOTH n8n workflows</li>
+                <li>locationId is correct (copied exactly from GHL)</li>
+                <li>Business hours match client's actual availability</li>
+                <li>Conversion link is correct and tested</li>
+                <li>GHL Automation created and published</li>
+                <li>GHL Webhook configured with correct URL</li>
+                <li>Test SMS received within 2 minutes</li>
+                <li>Reply triggers contextual response</li>
+                <li>Tags applied correctly in GHL</li>
+                <li>STOP keyword triggers opt-out</li>
+            </ul>
+        </div>
+
+        <div class="section" id="section-6">
+            <h1>6. GoHighLevel (GHL) Integration Standards</h1>
+            
+            <p>All LeadStacker bots integrate with GoHighLevel as the central CRM and lead management system.</p>
+
+            <h2>6.1 GHL Sub-Account Structure</h2>
+            <ul style="margin-left: 2rem;">
+                <li>Each client has their own GHL sub-account under LeadStacker agency</li>
+                <li>All client lead data lives in their sub-account</li>
+                <li>LeadStacker team has admin access to all sub-accounts</li>
+                <li>Clients have user-level access to their own sub-account</li>
+            </ul>
+
+            <h2>6.2 GHL Smart Views for Bot Management</h2>
+            <p>Create these Smart Views in each client's GHL sub-account:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>View Name</th>
+                        <th>Filter</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🤖 Active Bot Leads</td>
+                        <td><code>synth_active</code> OR <code>cb_active</code></td>
+                        <td>All leads currently managed by bots</td>
+                    </tr>
+                    <tr>
+                        <td>🔥 Hot Leads — Follow Up</td>
+                        <td><code>synth_high_intent</code></td>
+                        <td>High-intent leads needing human outreach</td>
+                    </tr>
+                    <tr>
+                        <td>⚠️ Escalated</td>
+                        <td><code>synth_escalate</code></td>
+                        <td>Leads flagged for human attention</td>
+                    </tr>
+                    <tr>
+                        <td>📋 Forms Sent — Pending</td>
+                        <td><code>synth_isa_sent</code>, NOT <code>synth_isa_complete</code></td>
+                        <td>Received form but haven't completed</td>
+                    </tr>
+                    <tr>
+                        <td>✅ Conversions</td>
+                        <td><code>synth_isa_complete</code></td>
+                        <td>Completed conversions</td>
+                    </tr>
+                    <tr>
+                        <td>🚫 Do Not Contact</td>
+                        <td><code>do_not_contact</code></td>
+                        <td>Opted-out leads</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="section-8">
+            <h1>8. Ongoing Maintenance & Audit Protocol</h1>
+
+            <h2>8.1 Maintenance Schedule</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Frequency</th>
+                        <th>Task</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Weekly</strong></td>
+                        <td>Review bot conversation logs — flag unusual patterns</td>
+                        <td>Account Manager</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Weekly</strong></td>
+                        <td>Review Synth n8n Executions for errors</td>
+                        <td>Developer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monthly</strong></td>
+                        <td>Full availability language audit (all platforms)</td>
+                        <td>Bot Builder</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monthly</strong></td>
+                        <td>Verify all URLs and offer details still active</td>
+                        <td>Account Manager</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quarterly</strong></td>
+                        <td>Full bot performance review</td>
+                        <td>Operations Lead</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quarterly</strong></td>
+                        <td>Review and update this SOP</td>
+                        <td>Operations Lead</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>8.2 Monthly Availability Language Audit</h2>
+            <div class="alert alert-danger">
+                <strong>Search for These Prohibited Phrases:</strong><br>
+                ❌ "Sunday: Closed"<br>
+                ❌ "Closed on Sunday"<br>
+                ❌ "Monday to Saturday"<br>
+                ❌ "Monday-Saturday"<br>
+                ❌ "Mon-Sat"
+                <br><br>
+                <strong>If found:</strong> Correct immediately, re-publish, and document.
+            </div>
+        </div>
+
+        <div class="section" id="section-9">
+            <h1>9. Appendices</h1>
+
+            <h2>Appendix A — Quick Reference Card</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Standard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Hours format</strong></td>
+                        <td>Business Hours: [Days]: [Time] [TZ] ([Statement])</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Correct days</strong></td>
+                        <td>"Monday through Sunday" or "Mon–Sun" — NEVER "Mon–Sat"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Max follow-ups</strong></td>
+                        <td>3 total across all channels combined</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Synth max attempts</strong></td>
+                        <td>3 per lead (SMS)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Opt-out handling</strong></td>
+                        <td>Immediate and permanent on first request</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Change log required?</strong></td>
+                        <td>YES — every change, every bot, every platform</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B — n8n Variables Reference</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Purpose</th>
+                        <th>Platform</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>CLAUDE_API_KEY</code></td>
+                        <td>Authenticates Claude API calls</td>
+                        <td>Synth</td>
+                    </tr>
+                    <tr>
+                        <td><code>GHL_AGENCY_TOKEN</code></td>
+                        <td>Authenticates GHL API calls</td>
+                        <td>Synth</td>
+                    </tr>
+                    <tr>
+                        <td><code>SYNTH_BASE_PROMPT</code></td>
+                        <td>Universal rules for Jamie</td>
+                        <td>Synth</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="logo" style="font-size: 1.8rem; margin-bottom: 1rem;">
+            Lead<span class="logo-accent">Stacker</span>
+        </div>
+        <p>AI Bot Operations SOP v2.0 · March 2026</p>
+        <div class="confidential">INTERNAL USE ONLY</div>
+        <p style="margin-top: 1rem;">Do not share with clients without Operations Lead approval.</p>
+    </div>
+</body>
+</html>
